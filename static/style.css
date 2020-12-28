@@ -1,0 +1,38 @@
+/*
+body
+{
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
+}
+*/
+
+div.visual_container
+{
+	border-style: solid;
+	text-align: center;
+	width: %50;
+	font-family: "Courier New";
+	font-size: 2em;
+	line-height: 0;
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
+	width: 260px;
+	height: 100px;
+	vertical-align: text-top;
+}
+
+p.line0, p.line1, p.line2
+{
+	/*padding: 0 0 0 0;*/
+}
+
+p.line0
+{
+	font-weight: bold;
+	margin-top: 16px;
+}
+
+p.line2
+{
+	font-weight: bold;
+}

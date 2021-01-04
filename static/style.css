@@ -6,6 +6,17 @@ body
 }
 */
 
+div.tag_container
+{
+	display: flex;
+}
+
+img.qrcode
+{
+	width: 128px;
+	height: 128px;
+}
+
 div.visual_sub_container
 {
 	border-style: solid;

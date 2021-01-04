@@ -2,6 +2,13 @@ DROP TABLE IF EXISTS vials;
 
 CREATE TABLE vials (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  code TEXT NOT NULL,
+  serial TEXT NOT NULL,
+  tissue TEXT NOT NULL,
+  donner INTEGER NOT NULL, 
+  vialnum INTEGER NOT NULL,
+  passage INTEGER NOT NULL, 
+  date_yy INTEGER NOT NULL, 
+  date_mm INTEGER NOT NULL,
+  date_dd INTEGER NOT NULL, 
   location TEXT NOT NULL
 );

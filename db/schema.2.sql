@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS vials;
+
+CREATE TABLE vials (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  code_l1 TEXT NOT NULL,
+  code_l2 TEXT NOT NULL, 
+  unique_id TEXT NOT NULL,
+  location TEXT NOT NULL
+);

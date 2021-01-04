@@ -6,7 +6,7 @@ body
 }
 */
 
-div.visual_container
+div.visual_sub_container
 {
 	border-style: solid;
 	text-align: center;
@@ -21,6 +21,11 @@ div.visual_container
 	vertical-align: text-top;
 }
 
+p.bold
+{
+	font-weight: bold;
+}
+
 p.line0, p.line1, p.line2
 {
 	/*padding: 0 0 0 0;*/
@@ -28,11 +33,9 @@ p.line0, p.line1, p.line2
 
 p.line0
 {
-	font-weight: bold;
 	margin-top: 16px;
 }
 
 p.line2
 {
-	font-weight: bold;
 }

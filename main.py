@@ -1,6 +1,7 @@
 import qrcode
 from flask import Flask, url_for, current_app, g, request
 import sqlite3
+import os
 
 from gencode import *
 from serialfuncs import *
@@ -91,7 +92,10 @@ def homepage():
     par = 3             #passage
     form += '<tr>\n'
     form += f'<td>{paramti[par]}</td>\n'
-    form += f'<td>P<input type=text maxlength=1 size=1 name="{paramid[par]}" id="{paramid[par]}" /></td>\n'
+    form += f'<td>P<input type=text maxlength=1 size=1 name="{paramid[par]}" id="{paramid[par]}" />'
+    form += f'Injection: <input type=radio name="passage_suffix" id="suf1" value="F" /><label for="F">Frozen</label>'
+    form += f'<input type=radio name="passage_suffix" id="suf2" value="C" /><label for="C">in culture</label>'
+    form += f'<input type=radio name="passage_suffix" id="suf3" value="x" checked="checked" /><label for="X">None</label></td>\n'
     form += '</tr>\n'
 
     par = 4             #production
@@ -123,6 +127,8 @@ def homepage():
 
     #form += f'{len(query_db())}'
 
+    form += '<br />\n'
+    
     form += '<div id="visual_code"></div>\n'
 
     form += footer()
@@ -139,6 +145,7 @@ def addvial():
         donner = request.args['donner']
         vialnum = int(request.args['vialnum'])
         passage = request.args['passage']
+        passage_suffix = request.args['passage_suffix']
         production = f'{request.args["date_yy"]}/{request.args["date_mm"]}/{request.args["date_dd"]}'
         location = request.args['location']
         number_of_tags = int(request.args['number'])
@@ -148,7 +155,7 @@ def addvial():
         #      add serial defragmentation
         query = 'SELECT serial FROM vials ORDER BY serial DESC'
         similar_vials = query_db(query)
-
+    
         new_serial = ''
         if (len(similar_vials) > 0):
             new_serial = similar_vials[0]['serial']
@@ -163,7 +170,7 @@ def addvial():
                                              tissue=tissue,
                                              donner=donner,
                                              passage=passage,
-                                             res1="0",
+                                             res1=passage_suffix,
                                              res2="X",
                                              vial_num=vialnum)
 
@@ -174,14 +181,28 @@ def addvial():
       
             query  = f'INSERT INTO vials (serial, tissue, donner, vialnum, passage, date_yy, date_mm, date_dd, location) '
             query += f"VALUES ('{genquery['serial']}', '{genquery['tissue']}', '{genquery['donner']}', '{genquery['vialnum']}', "
-            query += f"'{genquery['passage']}', {genquery['date_yy']}, {genquery['date_mm']}, {genquery['date_dd']}, '{location}') "
+            query += f"'{genquery['passage']}-{passage_suffix}', {genquery['date_yy']}, {genquery['date_mm']}, {genquery['date_dd']}, '{location}') "
             query_db(query)
+
+            #form += f'{query}\n'
+
+            img = qrcode.make(generated)
+            img.save(f'static\{new_serial}.png')
+            imgpath = url_for('static', filename=f'{new_serial}.png')
+
+            form += '<div class="tag_container">\n'
             
             form += '<div class="visual_sub_container">\n'
             form += f'<p class="line0"><b>{generated[0]}</b></p>\n'
             form += f'<p class="line1">{generated[1]}<b>{generated[2]}</b></p>\n'
             form += f'<p class="line2">{generated[3]}</p>\n'
             form += '</div>\n<br />\n'
+
+            form += '<div class="qrcode_container">\n'
+            form += f'<img class="qrcode" src="{imgpath}" />\n'
+            form += '</div>\n'
+
+            form += '</div>\n'
         
         form += '</div>\n'
 
@@ -192,7 +213,8 @@ def addvial():
 @app.route('/findvial', methods=['GET'])
 def findvial():
     get_db()
-    form = header()
+    #form = header()
+    form = ''
 
     query = 'SELECT * FROM vials '
     conditions = []
@@ -209,7 +231,7 @@ def findvial():
             conditions.append(f"(vialnum='{vnum(request.args['vialnum'])}')")
             
         if ('passage' in request.args) and (len(request.args['passage']) > 0):
-            conditions.append(f"(passage='{code_passage(request.args['passage'])}')")
+            conditions.append(f"(passage='{code_passage(request.args['passage'])}-{request.args['passage_suffix']}')")
             
         if ('date_yy' in request.args) and (len(request.args['date_yy']) > 0):
             conditions.append(f"(date_yy='{request.args['date_yy']}')")
@@ -268,12 +290,12 @@ def findvial():
 
     # Remove vial from the bank
     form += '<div id="remove_vial" title="Remove the vial from the bank?">\n'
-    form += '   <div id="message">lorum</div>\n'
+    form += '   <div id="message"></div>\n'
     form += '</div>\n'
         
     form += '</div>\n'
 
-    form += footer()
+    #form += footer()
     
     return form
 
@@ -305,22 +327,39 @@ def showvial():
 
             generated = outpair[0]
             
+            form += '<div class="tag_container">\n'
+            
             form += '<div class="visual_sub_container">\n'
             form += f'<p class="line0"><b>{generated[0]}</b></p>\n'
             form += f'<p class="line1">{generated[1]}<b>{generated[2]}</b></p>\n'
             form += f'<p class="line2">{generated[3]}</p>\n'
             form += '</div>\n<br />\n'
-            
+
+            imgpath = url_for('static', filename=f'{serial}.png')
+
+            form += '<div class="qrcode">\n'
+            form += f'<img class="qrcode" src="{imgpath}" />\n'
+            form += '</div>\n'
+
             form += '</div>\n'
 
     #form += footer()
     
     return form
-    
 
-@app.route('/qrgen')
-def qrgen():
-    img = qrcode.make('data')
-    img.save('static\currentqr.png')
-    imgpath = url_for('static', filename='currentqr.png')
-    return '<img src="' + imgpath + '" />'
+
+@app.route('/removevial', methods=['GET'])
+def removevial():
+    get_db()
+        
+    serial = request.args['serial']
+    query = f"DELETE FROM vials WHERE serial='{serial}'"
+    r = query_db(query)
+
+    img_path = f'static\{serial}.png'
+    if os.path.exists(img_path):
+        os.remove(img_path)
+    
+    return ''
+
+

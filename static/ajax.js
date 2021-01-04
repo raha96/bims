@@ -62,7 +62,7 @@ function remove_vial_dialog(tag_selector, vial_serial) {
 		{
 			if (this.status == 200)
 			{
-				$(tag_selector + " > #message").innerHTML = this.responseText;
+				//$(tag_selector).innerHTML = this.responseText;
 				$(tag_selector).dialog({
 					resizable: false, 
 					height: "auto", 
@@ -78,6 +78,7 @@ function remove_vial_dialog(tag_selector, vial_serial) {
 						}
 					}
 				});
+				jQuery("#message").html(xhttp.responseText);
 			}
 		}
 	};

@@ -268,7 +268,7 @@ def findvial():
 
     # Remove vial from the bank
     form += '<div id="remove_vial" title="Remove the vial from the bank?">\n'
-    form += '   <div id="message"></div>\n'
+    form += '   <div id="message">lorum</div>\n'
     form += '</div>\n'
         
     form += '</div>\n'
@@ -281,7 +281,8 @@ def findvial():
 @app.route('/showvial', methods=['GET'])
 def showvial():
     get_db()
-    form = header()
+    #form = header()
+    form = ''
     
     if (request.method == 'GET'):
         
@@ -312,7 +313,7 @@ def showvial():
             
             form += '</div>\n'
 
-    form += footer()
+    #form += footer()
     
     return form
     
